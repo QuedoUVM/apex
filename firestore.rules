@@ -75,7 +75,7 @@ service cloud.firestore {
     // Solo lectura para usuarios autenticados (para login por teléfono)
     // Escritura solo durante registro (controlada desde el cliente autenticado)
     match /phoneIndex/{phone} {
-      allow read: if isAuthenticated();
+      allow read: if true; // Requerido para login por teléfono (lookup pre-auth)
       allow create: if isAuthenticated()
         && request.resource.data.keys().hasOnly(['email'])
         && isValidString(request.resource.data.email, 200);

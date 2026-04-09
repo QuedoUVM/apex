@@ -22,7 +22,8 @@ import {
   validateCURP,
   validateDate,
 } from '../../constants/validation';
-import { colors, spacing, radii, fontSizes } from '../../styles/theme';
+import { spacing, radii, fontSizes } from '../../styles/theme';
+import { useTheme } from '../../context/ThemeContext';
 
 const INITIAL_FORM = {
   nombre: '',
@@ -39,6 +40,7 @@ const INITIAL_ERRORS = { ...INITIAL_FORM };
 
 export default function RegisterScreen() {
   const router = useRouter();
+  const { colors } = useTheme();
   const [step, setStep] = useState(1);
   const [form, setForm] = useState(INITIAL_FORM);
   const [errors, setErrors] = useState(INITIAL_ERRORS);
@@ -50,7 +52,6 @@ export default function RegisterScreen() {
     setErrors((prev) => ({ ...prev, [field]: '' }));
   };
 
-  // --- Validación por paso ---
   const validateStep1 = () => {
     const e = {};
     e.nombre = validateRequired(form.nombre, 'El nombre').message;
@@ -91,12 +92,114 @@ export default function RegisterScreen() {
     }
   };
 
+  const styles = StyleSheet.create({
+    fondo: {
+      flex: 1,
+      backgroundColor: colors.bg,
+    },
+    blob: {
+      position: 'absolute',
+      width: 300,
+      height: 300,
+      borderRadius: 150,
+      backgroundColor: colors.primary,
+      opacity: 0.12,
+      top: -60,
+      right: -60,
+    },
+    contenido: {
+      flexGrow: 1,
+      paddingHorizontal: spacing.xl,
+      paddingVertical: spacing.xxl,
+    },
+    appName: {
+      fontSize: 32,
+      fontWeight: '800',
+      color: colors.text,
+      textAlign: 'center',
+      marginBottom: spacing.xs,
+    },
+    tagline: {
+      fontSize: fontSizes.sm,
+      color: colors.textMuted,
+      textAlign: 'center',
+      marginBottom: spacing.lg,
+    },
+    stepIndicator: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: spacing.xs,
+    },
+    stepDot: {
+      width: 12,
+      height: 12,
+      borderRadius: 6,
+      backgroundColor: colors.textMuted,
+    },
+    stepDotActive: {
+      backgroundColor: colors.primary,
+    },
+    stepLine: {
+      width: 40,
+      height: 2,
+      backgroundColor: colors.border,
+      marginHorizontal: spacing.xs,
+    },
+    stepLabel: {
+      fontSize: fontSizes.xs,
+      color: colors.textMuted,
+      textAlign: 'center',
+      marginBottom: spacing.lg,
+    },
+    card: {
+      backgroundColor: colors.bgCard,
+      borderRadius: radii.xl,
+      padding: spacing.xl,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.2,
+      shadowRadius: 12,
+      elevation: 8,
+    },
+    titulo: {
+      fontSize: fontSizes.xl,
+      fontWeight: '700',
+      color: colors.text,
+      marginBottom: spacing.lg,
+    },
+    errorGeneral: {
+      color: colors.danger,
+      fontSize: fontSizes.sm,
+      marginBottom: spacing.sm,
+      textAlign: 'center',
+    },
+    boton: {
+      marginTop: spacing.sm,
+    },
+    botonBack: {
+      marginTop: spacing.sm,
+    },
+    linkWrap: {
+      marginTop: spacing.lg,
+      alignItems: 'center',
+    },
+    link: {
+      fontSize: fontSizes.sm,
+      color: colors.textSub,
+    },
+    linkBold: {
+      color: colors.primary,
+      fontWeight: '600',
+    },
+  });
+
   return (
     <KeyboardAvoidingView
       style={styles.fondo}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <StatusBar style="light" />
+      <StatusBar style={colors.statusBar} />
       <View style={styles.blob} />
 
       <ScrollView
@@ -236,105 +339,3 @@ export default function RegisterScreen() {
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  fondo: {
-    flex: 1,
-    backgroundColor: colors.bg,
-  },
-  blob: {
-    position: 'absolute',
-    width: 300,
-    height: 300,
-    borderRadius: 150,
-    backgroundColor: colors.primary,
-    opacity: 0.12,
-    top: -60,
-    right: -60,
-  },
-  contenido: {
-    flexGrow: 1,
-    paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.xxl,
-  },
-  appName: {
-    fontSize: 32,
-    fontWeight: '800',
-    color: colors.surface,
-    textAlign: 'center',
-    marginBottom: spacing.xs,
-  },
-  tagline: {
-    fontSize: fontSizes.sm,
-    color: colors.textLight,
-    textAlign: 'center',
-    marginBottom: spacing.lg,
-  },
-  stepIndicator: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.xs,
-  },
-  stepDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: colors.textLight,
-  },
-  stepDotActive: {
-    backgroundColor: colors.primary,
-  },
-  stepLine: {
-    width: 40,
-    height: 2,
-    backgroundColor: colors.border,
-    marginHorizontal: spacing.xs,
-  },
-  stepLabel: {
-    fontSize: fontSizes.xs,
-    color: colors.textLight,
-    textAlign: 'center',
-    marginBottom: spacing.lg,
-  },
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radii.xl,
-    padding: spacing.xl,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  titulo: {
-    fontSize: fontSizes.xl,
-    fontWeight: '700',
-    color: colors.textDark,
-    marginBottom: spacing.lg,
-  },
-  errorGeneral: {
-    color: colors.danger,
-    fontSize: fontSizes.sm,
-    marginBottom: spacing.sm,
-    textAlign: 'center',
-  },
-  boton: {
-    marginTop: spacing.sm,
-  },
-  botonBack: {
-    marginTop: spacing.sm,
-  },
-  linkWrap: {
-    marginTop: spacing.lg,
-    alignItems: 'center',
-  },
-  link: {
-    fontSize: fontSizes.sm,
-    color: colors.textMid,
-  },
-  linkBold: {
-    color: colors.primary,
-    fontWeight: '600',
-  },
-});

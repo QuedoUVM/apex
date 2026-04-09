@@ -14,14 +14,17 @@ import { StatusBar } from 'expo-status-bar';
 import AppInput from '../../components/ui/AppInput';
 import AppButton from '../../components/ui/AppButton';
 import { loginWithEmailOrPhone } from '../../services/auth';
-import { colors, spacing, radii, fontSizes } from '../../styles/theme';
+import { spacing, radii, fontSizes } from '../../styles/theme';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function LoginScreen() {
   const router = useRouter();
+  const { colors } = useTheme();
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const isSubmitting = useRef(false);
   const shake = useRef(new Animated.Value(0)).current;
 
   const sacudir = () => {
@@ -35,6 +38,7 @@ export default function LoginScreen() {
   };
 
   const handleLogin = async () => {
+    if (isSubmitting.current) return;
     setError('');
 
     if (!identifier.trim() || !password.trim()) {
@@ -43,6 +47,7 @@ export default function LoginScreen() {
       return;
     }
 
+    isSubmitting.current = true;
     setLoading(true);
     try {
       await loginWithEmailOrPhone(identifier, password);
@@ -52,15 +57,90 @@ export default function LoginScreen() {
       sacudir();
     } finally {
       setLoading(false);
+      isSubmitting.current = false;
     }
   };
+
+  const styles = StyleSheet.create({
+    fondo: {
+      flex: 1,
+      backgroundColor: colors.bg,
+    },
+    blob: {
+      position: 'absolute',
+      width: 320,
+      height: 320,
+      borderRadius: 160,
+      backgroundColor: colors.primary,
+      opacity: 0.15,
+      top: -80,
+      left: -80,
+    },
+    contenido: {
+      flexGrow: 1,
+      justifyContent: 'center',
+      paddingHorizontal: spacing.xl,
+      paddingVertical: spacing.xxl,
+    },
+    appName: {
+      fontSize: 36,
+      fontWeight: '800',
+      color: colors.text,
+      textAlign: 'center',
+      marginBottom: spacing.xs,
+      letterSpacing: 1,
+    },
+    tagline: {
+      fontSize: fontSizes.sm,
+      color: colors.textMuted,
+      textAlign: 'center',
+      marginBottom: spacing.xxl,
+    },
+    card: {
+      backgroundColor: colors.bgCard,
+      borderRadius: radii.xl,
+      padding: spacing.xl,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.2,
+      shadowRadius: 12,
+      elevation: 8,
+    },
+    titulo: {
+      fontSize: fontSizes.xl,
+      fontWeight: '700',
+      color: colors.text,
+      marginBottom: spacing.lg,
+    },
+    errorGeneral: {
+      color: colors.danger,
+      fontSize: fontSizes.sm,
+      marginBottom: spacing.sm,
+      textAlign: 'center',
+    },
+    boton: {
+      marginTop: spacing.sm,
+    },
+    linkWrap: {
+      marginTop: spacing.lg,
+      alignItems: 'center',
+    },
+    link: {
+      fontSize: fontSizes.sm,
+      color: colors.textSub,
+    },
+    linkBold: {
+      color: colors.primary,
+      fontWeight: '600',
+    },
+  });
 
   return (
     <KeyboardAvoidingView
       style={styles.fondo}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <StatusBar style="light" />
+      <StatusBar style={colors.statusBar} />
       <View style={styles.blob} />
 
       <ScrollView
@@ -112,77 +192,3 @@ export default function LoginScreen() {
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  fondo: {
-    flex: 1,
-    backgroundColor: colors.bg,
-  },
-  blob: {
-    position: 'absolute',
-    width: 320,
-    height: 320,
-    borderRadius: 160,
-    backgroundColor: colors.primary,
-    opacity: 0.15,
-    top: -80,
-    left: -80,
-  },
-  contenido: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.xxl,
-  },
-  appName: {
-    fontSize: 36,
-    fontWeight: '800',
-    color: colors.surface,
-    textAlign: 'center',
-    marginBottom: spacing.xs,
-    letterSpacing: 1,
-  },
-  tagline: {
-    fontSize: fontSizes.sm,
-    color: colors.textLight,
-    textAlign: 'center',
-    marginBottom: spacing.xxl,
-  },
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radii.xl,
-    padding: spacing.xl,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  titulo: {
-    fontSize: fontSizes.xl,
-    fontWeight: '700',
-    color: colors.textDark,
-    marginBottom: spacing.lg,
-  },
-  errorGeneral: {
-    color: colors.danger,
-    fontSize: fontSizes.sm,
-    marginBottom: spacing.sm,
-    textAlign: 'center',
-  },
-  boton: {
-    marginTop: spacing.sm,
-  },
-  linkWrap: {
-    marginTop: spacing.lg,
-    alignItems: 'center',
-  },
-  link: {
-    fontSize: fontSizes.sm,
-    color: colors.textMid,
-  },
-  linkBold: {
-    color: colors.primary,
-    fontWeight: '600',
-  },
-});
