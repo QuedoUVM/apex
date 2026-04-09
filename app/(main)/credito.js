@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { doc, getDoc } from 'firebase/firestore';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../hooks/useAuth';
+import { parseMonto } from '../../constants/validation';
 import { getGastos } from '../../services/gastos';
 import { getIngresos } from '../../services/ingresos';
 import { db } from '../../services/firebase';
@@ -15,8 +16,14 @@ import { HP, fontSizes, radii } from '../../styles/theme';
 
 function calcularPuntaje(gastos, ingresos, createdAt) {
   let score = 600;
-  const tG = gastos.reduce( (s, x) => s + (x.monto || 0), 0);
-  const tI = ingresos.reduce((s, x) => s + (x.monto || 0), 0);
+  const tG = gastos.reduce((s, x) => {
+    const m = parseMonto(x.monto);
+    return m !== null ? s + m : s;
+  }, 0);
+  const tI = ingresos.reduce((s, x) => {
+    const m = parseMonto(x.monto);
+    return m !== null ? s + m : s;
+  }, 0);
   if (tI > 0) {
     const r = tG / tI;
     if      (r < 0.4) score += 80;
@@ -74,8 +81,14 @@ export default function CreditoScreen() {
       const score = calcularPuntaje(gastos, ingresos, createdAt);
       setPuntaje(score);
 
-      const tG = gastos.reduce( (s, x) => s + (x.monto || 0), 0);
-      const tI = ingresos.reduce((s, x) => s + (x.monto || 0), 0);
+      const tG = gastos.reduce((s, x) => {
+        const m = parseMonto(x.monto);
+        return m !== null ? s + m : s;
+      }, 0);
+      const tI = ingresos.reduce((s, x) => {
+        const m = parseMonto(x.monto);
+        return m !== null ? s + m : s;
+      }, 0);
       const ratio = tI > 0 ? tG / tI : 1;
       const meses = createdAt
         ? Math.floor((Date.now() - new Date(createdAt).getTime()) / 2592000000)

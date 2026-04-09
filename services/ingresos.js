@@ -1,5 +1,6 @@
 import { collection, doc, addDoc, deleteDoc, getDocs, query, orderBy, serverTimestamp } from 'firebase/firestore';
 import { db } from './firebase';
+import { sanitizeText, validateMonto, validateTransactionDate, parseMonto } from '../constants/validation';
 
 const ref = (uid) => collection(db, 'users', uid, 'ingresos');
 
@@ -19,10 +20,25 @@ export async function getIngresos(uid) {
 }
 
 export async function addIngreso(uid, { descripcion, monto, categoria, fecha, icon }) {
+  // Validar monto
+  const montoValidation = validateMonto(monto);
+  if (!montoValidation.valid) throw new Error(montoValidation.message);
+
+  // Validar fecha
+  const fechaValidation = validateTransactionDate(fecha);
+  if (!fechaValidation.valid) throw new Error(fechaValidation.message);
+
+  // Sanitizar descripción
+  const safeDescripcion = sanitizeText(descripcion, 200);
+  if (!safeDescripcion) throw new Error('La descripción no puede estar vacía.');
+
+  const safeCategoria = sanitizeText(categoria, 50);
+  const safeMonto = parseMonto(monto);
+
   await addDoc(ref(uid), {
-    descripcion: descripcion.trim(),
-    monto:       parseFloat(monto),
-    categoria,
+    descripcion: safeDescripcion,
+    monto:       safeMonto,
+    categoria:   safeCategoria,
     icon,
     fecha,
     createdAt:   serverTimestamp(),

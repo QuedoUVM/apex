@@ -1,0 +1,90 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Funciones helper ──────────────────────────────────────────────
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isAuthenticated() && request.auth.uid == uid;
+    }
+
+    function isValidString(field, maxLen) {
+      return field is string && field.size() > 0 && field.size() <= maxLen;
+    }
+
+    function isValidMonto(monto) {
+      return monto is number && monto >= 0.01 && monto <= 9999999.99;
+    }
+
+    function isValidFecha(fecha) {
+      return fecha is string && fecha.matches('\\d{4}-\\d{2}-\\d{2}');
+    }
+
+    // ── Perfil de usuario ─────────────────────────────────────────────
+    match /users/{uid} {
+      allow read: if isOwner(uid);
+      allow create: if isOwner(uid)
+        && isValidString(request.resource.data.nombre, 100)
+        && isValidString(request.resource.data.email, 200);
+      allow update: if isOwner(uid);
+      allow delete: if isOwner(uid);
+
+      // ── Gastos ───────────────────────────────────────────────────
+      match /gastos/{gastoId} {
+        allow read: if isOwner(uid);
+        allow create: if isOwner(uid)
+          && isValidMonto(request.resource.data.monto)
+          && isValidString(request.resource.data.descripcion, 200)
+          && isValidFecha(request.resource.data.fecha);
+        allow update: if isOwner(uid);
+        allow delete: if isOwner(uid);
+      }
+
+      // ── Ingresos ─────────────────────────────────────────────────
+      match /ingresos/{ingresoId} {
+        allow read: if isOwner(uid);
+        allow create: if isOwner(uid)
+          && isValidMonto(request.resource.data.monto)
+          && isValidString(request.resource.data.descripcion, 200)
+          && isValidFecha(request.resource.data.fecha);
+        allow update: if isOwner(uid);
+        allow delete: if isOwner(uid);
+      }
+
+      // ── Inversiones ──────────────────────────────────────────────
+      match /inversiones/{inversionId} {
+        allow read: if isOwner(uid);
+        allow create: if isOwner(uid)
+          && isValidMonto(request.resource.data.montoInvertido)
+          && isValidString(request.resource.data.nombre, 100);
+        allow update: if isOwner(uid);
+        allow delete: if isOwner(uid);
+      }
+
+      // ── Notificaciones ───────────────────────────────────────────
+      match /notificaciones/{notifId} {
+        allow read: if isOwner(uid);
+        allow write: if isOwner(uid);
+      }
+    }
+
+    // ── Índice de teléfonos ──────────────────────────────────────────
+    // Solo lectura para usuarios autenticados (para login por teléfono)
+    // Escritura solo durante registro (controlada desde el cliente autenticado)
+    match /phoneIndex/{phone} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated()
+        && request.resource.data.keys().hasOnly(['email'])
+        && isValidString(request.resource.data.email, 200);
+      allow update, delete: if false;
+    }
+
+    // ── Denegar todo lo demás ────────────────────────────────────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

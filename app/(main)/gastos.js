@@ -1,8 +1,9 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import {
   View, Text, FlatList, TouchableOpacity, Modal,
-  TextInput, ScrollView, ActivityIndicator, StyleSheet, Alert,
+  TextInput, ScrollView, ActivityIndicator, StyleSheet, Alert, Platform,
 } from 'react-native';
+import Toast from '../../components/ui/Toast';
 import { useFocusEffect } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
@@ -29,6 +30,8 @@ export default function GastosScreen() {
   const [saving,  setSaving]  = useState(false);
   const [form,    setForm]    = useState(INIT);
   const [errors,  setErrors]  = useState({});
+  const [toast,   setToast]   = useState(null);
+  const isSubmitting = useRef(false);
 
   const cargar = useCallback(async () => {
     if (!user) return;
@@ -50,6 +53,8 @@ export default function GastosScreen() {
 
   const guardar = async () => {
     if (!validar()) return;
+    if (isSubmitting.current) return;
+    isSubmitting.current = true;
     setSaving(true);
     try {
       const cat = CATEGORIAS_GASTO.find((c) => c.label === form.categoria);
@@ -62,12 +67,17 @@ export default function GastosScreen() {
         });
       }
       setForm(INIT); setModal(false); cargar();
+      setToast({ message: 'Gasto guardado', type: 'success' });
     } catch { Alert.alert('Error', 'No se pudo guardar el gasto.'); }
-    finally { setSaving(false); }
+    finally { setSaving(false); isSubmitting.current = false; }
   };
 
   const eliminar = async (id) => {
-    try { await deleteGasto(user.uid, id); setItems((p) => p.filter((x) => x.id !== id)); }
+    try {
+      await deleteGasto(user.uid, id);
+      setItems((p) => p.filter((x) => x.id !== id));
+      setToast({ message: 'Gasto eliminado', type: 'success' });
+    }
     catch { Alert.alert('Error', 'No se pudo eliminar.'); }
   };
 
@@ -115,6 +125,8 @@ export default function GastosScreen() {
         />
       )}
 
+      <Toast config={toast} onHide={() => setToast(null)} />
+
       {/* ── Modal ── */}
       <Modal visible={modal} transparent animationType="slide" onRequestClose={() => setModal(false)}>
         <View style={s.overlay}>
@@ -143,15 +155,30 @@ export default function GastosScreen() {
             />
             {errors.monto ? <Text style={[s.err, { color: colors.danger }]}>{errors.monto}</Text> : null}
 
-            <Text style={[s.lbl, { color: colors.textSub }]}>Fecha (AAAA-MM-DD)</Text>
-            <TextInput
-              style={[s.inp, { backgroundColor: colors.bgInput, borderColor: errors.fecha ? colors.danger : colors.border, color: colors.text }]}
-              placeholder={HOY}
-              placeholderTextColor={colors.textMuted}
-              value={form.fecha}
-              onChangeText={set('fecha')}
-              maxLength={10}
-            />
+            <Text style={[s.lbl, { color: colors.textSub }]}>Fecha</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <TextInput
+                style={[s.inp, { flex: 1, backgroundColor: colors.bgInput, borderColor: errors.fecha ? colors.danger : colors.border, color: colors.text }]}
+                placeholder="AAAA-MM-DD"
+                placeholderTextColor={colors.textMuted}
+                value={form.fecha}
+                onChangeText={set('fecha')}
+                keyboardType="numeric"
+                maxLength={10}
+              />
+              <TouchableOpacity
+                style={{ padding: 8, backgroundColor: colors.accent, borderRadius: 8 }}
+                onPress={() => {
+                  const d = new Date();
+                  const yyyy = d.getFullYear();
+                  const mm = String(d.getMonth() + 1).padStart(2, '0');
+                  const dd = String(d.getDate()).padStart(2, '0');
+                  set('fecha')(`${yyyy}-${mm}-${dd}`);
+                }}
+              >
+                <Text style={{ color: '#fff', fontSize: 12, fontWeight: '600' }}>Hoy</Text>
+              </TouchableOpacity>
+            </View>
             {errors.fecha ? <Text style={[s.err, { color: colors.danger }]}>{errors.fecha}</Text> : null}
 
             <Text style={[s.lbl, { color: colors.textSub }]}>Categoría</Text>

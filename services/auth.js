@@ -8,6 +8,7 @@ import {
   doc,
   setDoc,
   getDoc,
+  writeBatch,
   serverTimestamp,
 } from 'firebase/firestore';
 import { auth, db } from './firebase';
@@ -48,7 +49,9 @@ export async function registerUser(formData) {
     const normalizedPhone = normalizePhone(formData.phone);
     const normalizedEmail = formData.email.trim().toLowerCase();
 
-    await setDoc(doc(db, 'users', credential.user.uid), {
+    const batch = writeBatch(db);
+
+    batch.set(doc(db, 'users', credential.user.uid), {
       uid: credential.user.uid,
       nombre: formData.nombre.trim(),
       email: normalizedEmail,
@@ -61,9 +64,11 @@ export async function registerUser(formData) {
     });
 
     // Índice público para login por teléfono (sin datos sensibles)
-    await setDoc(doc(db, 'phoneIndex', normalizedPhone), {
+    batch.set(doc(db, 'phoneIndex', normalizedPhone), {
       email: normalizedEmail,
     });
+
+    await batch.commit();
 
     return credential.user;
   } catch (error) {
