@@ -1,11 +1,15 @@
 {
   "expo": {
-    "name": "apex_app",
-    "slug": "apex_app",
+    "name": "Athena",
+    "slug": "athena-notion-agent",
+    "scheme": [
+      "athena-notion-agent",
+      "com.googleusercontent.apps.788449188960-7osoocud4e378viehtl4crdbppn556hu"
+    ],
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
@@ -16,6 +20,7 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.uvm.athenaAndroid",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -24,6 +29,16 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-web-browser",
+      "expo-secure-store",
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Permite a Athena usar Face ID para iniciar sesión de forma segura."
+        }
+      ]
+    ]
   }
 }
