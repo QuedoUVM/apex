@@ -1,0 +1,8 @@
+node_modules/
+.expo/
+.git/
+*.md
+android/
+ios/
+web-build/
+dist/
