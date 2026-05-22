@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>788449188960-7osoocud4e378viehtl4crdbppn556hu.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.788449188960-7osoocud4e378viehtl4crdbppn556hu</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>788449188960-ai4tj6uqsptv8f8j3tkmbe1dq8quhd51.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBEJR98eRiWouzRQH2Q_TG0f1YtHILFrQA</string>
+	<key>GCM_SENDER_ID</key>
+	<string>788449188960</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.uvm.athena</string>
+	<key>PROJECT_ID</key>
+	<string>athena-f695a</string>
+	<key>STORAGE_BUCKET</key>
+	<string>athena-f695a.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:788449188960:ios:9a0be23be682b466363705</string>
+</dict>
+</plist>
