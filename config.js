@@ -11,6 +11,8 @@
 //   iOS Simulator  → use "localhost"
 //   Android Emulator → use "10.0.2.2"
 //   Physical device → use the host machine's LAN IP (e.g. 192.168.1.42)
-export const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:8000';
+// Production backend on Render — works with the developer's PC off.
+export const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'https://athena-api-osjl.onrender.com';
 
-export const FETCH_TIMEOUT_MS = 15000;
+// 60s tolerates a cold start on free cloud tiers (server wakes from idle ~50s).
+export const FETCH_TIMEOUT_MS = 60000;

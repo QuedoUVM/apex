@@ -25,7 +25,11 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "permissions": [
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -39,6 +43,12 @@
           "faceIDPermission": "Permite a Athena usar Face ID para iniciar sesión de forma segura."
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "3dc80a31-49f8-4485-ba7b-d82144f25358"
+      }
+    },
+    "owner": "quedo02"
   }
 }
